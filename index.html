@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        /* 引入本地字体文件 */
+        @font-face {
+            font-family: '';
+            src: url('fonts/') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: '', Arial, sans-serif;
+            background-color: #000;
+            color: rgba(255, 165, 0, 1);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 400px;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(255, 165, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar img {
+            height: 100%;
+            width: auto;
+            object-fit: cover;
+        }
+
+        .main-content {
+            margin-left: 400px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            width: calc(100% - 400px);
+            height: 100vh;
+            overflow: hidden;
+            position: relative; 
+        }
+
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-shadow: 0 0 20px rgba(255, 165, 0, 1);
+            width: 100%;
+            max-width: 800px;
+            flex-shrink: 0;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            flex-wrap: nowrap;
+            margin-bottom: 10px;
+        }
+
+        .profile-header h1 {
+            margin: 0;
+            font-size: 36px;
+            color: rgba(255, 165, 0, 1);
+            flex-shrink: 0;
+        }
+
+        #languageSwitcher {
+            margin: 0 20px;
+            flex-shrink: 0;
+        }
+
+        #languageSwitcher button {
+            background-color: transparent;
+            border: none;
+            color: rgba(255, 165, 0, 1);
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: underline;
+            padding: 0;
+            margin: 0;
+        }
+
+        #languageSwitcher button:hover {
+            color: rgba(255, 215, 0, 1);
+        }
+
+        .search-box {
+            width: 150px;
+            padding: 5px 10px;
+            font-size: 16px;
+            border: 2px solid rgba(255, 165, 0, 1);
+            background-color: transparent;
+            color: rgba(255, 165, 0, 1);
+            border-radius: 4px;
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 165, 0, 1);
+            transition: box-shadow 0.3s;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        .search-box::placeholder {
+            color: rgba(255, 165, 0, 0.7);
+        }
+
+        .search-box:focus {
+            box-shadow: 0 0 20px rgba(255, 165, 0, 1);
+        }
+
+        .profile-text {
+            margin-top: 10px;
+            font-size: 18px;
+            line-height: 1.5;
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-block;
+            position: relative;
+            min-height: 1.8em;
+            padding-right: 12px;
+        }
+
+        .profile-text::after {
+            content: '';
+            position: absolute;
+            left: 100%;
+            top: 0;
+            width: 2px;
+            height: 1.8em;
+            background-color: rgba(255, 165, 0, 1);
+            animation: blink-caret 1s step-end infinite;
+        }
+
+        @keyframes blink-caret {
+            from, to { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* 链接列表区域 */
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 40px 0;
+            flex: 1;
+            overflow-y: auto; 
+            padding-right: 10px; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 自定义滚动条样式（可选） */
+        .container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: rgba(255, 165, 0, 0.1);
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 165, 0, 0.5);
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            flex: 1; /* 让表格填满容器 */
+            min-width: 600px; /* 根据需要调整最小宽度 */
+        }
+
+        thead th {
+            border-bottom: 2px solid rgba(255, 165, 0, 0.5);
+            cursor: pointer;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 165, 0, 1);
+            font-size: 24px;
+        }
+
+        td {
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 165, 0, 0.1);
+        }
+
+        tr:hover td {
+            text-shadow: 0 0 15px rgba(255, 165, 0, 1);
+        }
+
+        a {
+            color: rgba(255, 165, 0, 1);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: rgba(255, 215, 0, 1);
+        }
+
+        /* 图标样式 */
+        .icon {
+            width: 24px;
+            height: 24px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        /* 详细信息区域 */
+        .details {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 800px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 0;
+            opacity: 1; 
+            transition: opacity 0.2s ease;
+            border: 2px solid rgba(255, 165, 0, 1);
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
+            text-align: left;
+            display: flex;
+            align-items: flex-start;
+            flex-direction: row-reverse; 
+            flex-shrink: 0; 
+        }
+
+        .details.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .details-image {
+            width: 200px;
+            margin-left: 20px;
+        }
+
+        .details-text {
+            flex: 1;
+            font-size: 18px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        @media (max-width: 800px) {
+            .main-content {
+                padding: 10px;
+            }
+
+            .profile-header h1 {
+                font-size: 28px;
+            }
+
+            .profile-text {
+                font-size: 16px;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 16px;
+            }
+
+            .details-text {
+                font-size: 16px;
+            }
+
+            .details {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .details-image {
+                margin-left: 0;
+                margin-bottom: 20px;
+                width: 100%;
+            }
+
+            .container {
+                flex: 1;
+                max-height: none; 
+            }
+
+            .profile-header {
+                flex-wrap: wrap; 
+            }
+
+            .search-box {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+                max-width: 150px;
+            }
+
+            #languageSwitcher {
+                margin: 10px 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                width: 150px;
+            }
+
+            .sidebar img {
+                width: 100%;
+                height: auto; 
+                object-fit: cover;
+            }
+
+            .main-content {
+                margin-left: 150px; 
+                padding: 10px;
+                width: calc(100% - 150px); 
+                height: auto; 
+                overflow-y: auto; 
+            }
+
+            .profile-header h1 {
+                font-size: 24px;
+            }
+
+            .profile-text {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            .details-text {
+                font-size: 14px;
+            }
+
+            .container {
+                flex: 1;
+                max-height: none; 
+            }
+
+            .search-box {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+                max-width: 150px;
+            }
+
+            #languageSwitcher {
+                margin: 10px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                justify-content: center;
+                box-shadow: none;
+            }
+
+            .sidebar img {
+                width: 100px;
+                height: auto;
+                margin: 10px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px 10px;
+                height: auto; /* 根据内容自适应高度 */
+                overflow-y: auto; /* 允许垂直滚动 */
+            }
+
+            .container table {
+                min-width: 300px; /* 根据需要调整最小宽度 */
+            }
+
+            .container::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .container::-webkit-scrollbar-thumb {
+                background-color: rgba(255, 165, 0, 0.5);
+                border-radius: 3px;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-box {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+                max-width: 150px;
+            }
+
+            #languageSwitcher {
+                margin: 10px 0;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 165, 0, 1);
+            text-shadow: 0 0 10px rgba(255, 165, 0, 1);
+            font-size: 14px;
+            margin-top: 20px;
+            flex-shrink: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 头像侧边栏 -->
+    <div class="sidebar">
+        <img src="Avatar.png" alt="头像"><!-- 头像 -->
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+
+        <div class="profile-container">
+            <div class="profile-header">
+                <h1 id="mainTitle">网站</h1>
+                <div id="languageSwitcher">
+                    <button id="languageButton" onclick="switchLanguage()"></button>
+                </div>
+                <input type="text" placeholder="搜索..." class="search-box" id="searchBox">
+            </div>
+
+            <div class="profile-text" id="profileText">
+            </div>
+
+        </div>
+
+        <div class="container">
+            <table id="dataTable">
+                <thead>
+                    <tr id="headerRow">
+                        <th id="noHeader">No.</th>
+                        <th id="codeHeader">Code</th>
+                        <th id="nameHeader">Name</th>
+                        <th id="descriptionHeader">Description</th>
+                        <th id="iconHeader">Icon</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-details-zh="中文" data-details-en="English" data-image="Photo.png"><!-- 详细信息 -->
+                        <td>0</td> <!-- 序号 对应No. -->
+                        <td><a href="#">LocalHost</a></td><!-- 点击访问链接 对应 Code-->
+                        <td>Name</td><!-- 名字 对应 Name -->
+                        <td data-description-zh="网站" data-description-en="Website">Website</td><!-- 简单描述 对应Description -->
+                        <td><img src="" alt="默认图标" class="icon"></td>
+                    </tr>
+                    <!-- 可以根据需要添加更多行 -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const rows = document.querySelectorAll('tbody tr');
+            const headerRow = document.getElementById('headerRow');
+            const detailsDisplay = document.getElementById('detailsDisplay');
+            const detailText = document.getElementById('detailText');
+            const detailImage = document.getElementById('detailImage');
+            const languageButton = document.getElementById('languageButton');
+
+            // 定义默认详细信息和图片
+            let defaultDetails = "Default";
+            const defaultImage = "default.png"; // 请确保此图片存在于你的项目中
+
+            detailText.textContent = defaultDetails;
+            detailImage.src = defaultImage;
+
+            headerRow.addEventListener('click', () => {
+                detailText.textContent = defaultDetails;
+                detailImage.src = defaultImage;
+                detailsDisplay.classList.add('visible');
+            });
+
+            rows.forEach((row) => {
+                row.addEventListener('click', () => {
+                    const details = row.getAttribute('data-details');
+                    const imageSrc = row.getAttribute('data-image');
+
+                    if (details) {
+                        detailText.textContent = details;
+                        if (imageSrc) {
+                            detailImage.src = imageSrc;
+                            detailImage.style.display = 'block';
+                        } else {
+                            detailImage.style.display = 'none';
+                        }
+                        detailsDisplay.classList.add('visible');
+                    }
+                });
+            });
+
+            // 定义多语言内容
+            const languageContent = {
+                'zh': {
+                    'title': '网站',//标题
+                    'searchPlaceholder': '搜索...',//搜索栏
+                    'code': '代码',//代码
+                    'name': '名称',//名称
+                    'description': '描述',//描述
+                    'icon': '图标',//图标
+                    'footer': '&copy; 2024 中天恒正. 版权所有.',//中文版权声明
+                    'typingText': '这是一个网站的简介',//简介
+                    'detailsDefault': '这是一个网站的描述',//默认描述
+                    'languageButton': 'English',//语言选项
+                    'no': '序号',//序号
+                    'typingSpeed': 300, // 中文打字速度
+                    'deletingSpeed': 150 //回退速度
+                },
+                'en': { //英文的对应上面
+                    'title': 'Website',
+                    'searchPlaceholder': 'Search...',
+                    'code': 'Code',
+                    'name': 'Name',
+                    'description': 'Description',
+                    'icon': 'Icon',
+                    'footer': '&copy; 2024 ZTHZ. All rights reserved.',
+                    'typingText': 'Here\'s a brief description of the site',
+                    'detailsDefault': 'Here\'s a description of the site',
+                    'languageButton': '中文',
+                    'no': 'No.',
+                    'typingSpeed': 150,
+                    'deletingSpeed': 75
+                }
+            };
+
+            let currentLanguage = 'zh';//默认显示语言
+
+            let content = languageContent[currentLanguage]['typingText'];
+            let index = 0;
+            let isDeleting = false;
+            let typingSpeed = languageContent[currentLanguage]['typingSpeed'];
+            let deletingSpeed = languageContent[currentLanguage]['deletingSpeed'];
+            const pause = 2000; 
+
+            function typeWriter() {
+                const profileText = document.getElementById("profileText");
+
+                const text = content.substring(0, index);
+
+                profileText.textContent = text;
+
+                if (!isDeleting) {
+                    if (index < content.length) {
+                        index++;
+                        setTimeout(typeWriter, typingSpeed);
+                    } else {
+                        isDeleting = true;
+                        setTimeout(typeWriter, pause);
+                    }
+                } else {
+                    if (index > 0) {
+                        index--;
+                        setTimeout(typeWriter, deletingSpeed);
+                    } else {
+                        isDeleting = false;
+                        setTimeout(typeWriter, typingSpeed);
+                    }
+                }
+            }
+
+            typeWriter();
+
+            const searchBox = document.getElementById('searchBox');
+            const dataTable = document.getElementById('dataTable');
+            const tableRows = dataTable.getElementsByTagName('tr');
+
+            searchBox.addEventListener('input', function() {
+                const filter = this.value.toLowerCase();
+                for (let i = 1; i < tableRows.length; i++) {
+                    const cells = tableRows[i].getElementsByTagName('td');
+                    let match = false;
+                    for (let j = 0; j < cells.length - 1; j++) {
+                        if (cells[j].innerText.toLowerCase().includes(filter)) {
+                            match = true;
+                            break;
+                        }
+                    }
+                    tableRows[i].style.display = match ? '' : 'none';
+                }
+            });
+
+            window.switchLanguage = function() {
+                currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
+                const lang = currentLanguage;
+
+                document.getElementById('mainTitle').textContent = languageContent[lang]['title'];
+
+                document.getElementById('searchBox').placeholder = languageContent[lang]['searchPlaceholder'];
+
+                document.getElementById('noHeader').textContent = languageContent[lang]['no'];
+                document.getElementById('codeHeader').textContent = languageContent[lang]['code'];
+                document.getElementById('nameHeader').textContent = languageContent[lang]['name'];
+                document.getElementById('descriptionHeader').textContent = languageContent[lang]['description'];
+                document.getElementById('iconHeader').textContent = languageContent[lang]['icon'];
+
+                document.getElementById('footerText').innerHTML = languageContent[lang]['footer'];
+
+                content = languageContent[lang]['typingText'];
+                typingSpeed = languageContent[lang]['typingSpeed'];
+                deletingSpeed = languageContent[lang]['deletingSpeed'];
+
+                languageButton.textContent = languageContent[lang]['languageButton'];
+
+                index = 0;
+                isDeleting = false;
+
+                defaultDetails = languageContent[lang]['detailsDefault'];
+                detailText.textContent = defaultDetails;
+
+                rows.forEach((row) => {
+                    const cells = row.getElementsByTagName('td');
+
+                    const nameCell = cells[2];
+                    if (nameCell) {
+                        nameCell.textContent = nameCell.getAttribute(`data-name-${lang}`) || nameCell.textContent;
+                    }
+
+                    const descriptionCell = cells[3];
+                    if (descriptionCell) {
+                        descriptionCell.textContent = descriptionCell.getAttribute(`data-description-${lang}`) || descriptionCell.textContent;
+                    }
+
+                    const dataDetails = row.getAttribute(`data-details-${lang}`);
+                    if (dataDetails) {
+                        row.setAttribute('data-details', dataDetails);
+                    }
+                });
+
+                typeWriter();
+            };
+
+            switchLanguage();
+        });
+    </script>
+
+</body>
+</html>
